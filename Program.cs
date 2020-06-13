@@ -25,16 +25,15 @@ namespace ScreenParser
 
         private static void HotKeyManager_StartCapture(object sender, HotKeyEventArgs e)
         {
-            Console.WriteLine("oh shiii");
             if (e.Key == Keys.D1 && e.Modifiers == KeyModifiers.Alt)
             {
-                Console.WriteLine("making that new form yo");
                 Form f = new FormRect();
+                f.Bounds = Screen.PrimaryScreen.Bounds;
+                f.StartPosition = FormStartPosition.CenterScreen;
+                f.TopMost = true;
                 f.BackColor = Color.White;
                 f.Opacity = .25;
                 f.FormBorderStyle = FormBorderStyle.None;
-                f.Bounds = Screen.PrimaryScreen.Bounds;
-                f.TopMost = true;
                 f.ShowDialog();
             }
         }
