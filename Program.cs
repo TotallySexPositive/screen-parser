@@ -15,8 +15,10 @@ namespace ScreenParser
         {
             HotKeyManager.RegisterHotKey(Keys.D1, KeyModifiers.Alt);
             HotKeyManager.RegisterHotKey(Keys.Escape, KeyModifiers.Alt);
+            HotKeyManager.RegisterHotKey(Keys.D2, KeyModifiers.Alt);
             HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_StartCapture);
             HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_KillProgram);
+            HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_OpenImage);
             Application.EnableVisualStyles();
             Application.Run();
         }
@@ -42,6 +44,14 @@ namespace ScreenParser
             if (e.Key == Keys.Escape && e.Modifiers == KeyModifiers.Alt)
             {
                 Application.Exit();
+            }
+        }
+
+        private static void HotKeyManager_OpenImage(object sender, HotKeyEventArgs e)
+        {
+            if (e.Key == Keys.D2 && e.Modifiers == KeyModifiers.Alt)
+            {
+                Process.Start("explorer.exe", ScreenParser.Capture.imagePath);
             }
         }
 

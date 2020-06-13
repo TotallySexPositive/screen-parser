@@ -58,14 +58,6 @@ namespace ScreenParser
             }
         }
 
-        private void panel1_keyDown(object sender, KeyEventArgs e)
-        {
-        }
-
-        private void panel1_keyUp(object sender, KeyEventArgs e)
-        {
-        }
-
         private void InitializeComponent()
         {
             this.SuspendLayout();
@@ -78,8 +70,6 @@ namespace ScreenParser
             this.MouseUp += new MouseEventHandler(this.panel1_MouseUp);
             this.MouseDown += new MouseEventHandler(this.panel1_MouseDown);
             this.MouseMove += new MouseEventHandler(this.panel1_MouseMove);
-            this.KeyDown += new KeyEventHandler(this.panel1_keyDown);
-            this.KeyUp += new KeyEventHandler(this.panel1_keyUp);
             this.ResumeLayout(false);
 
         }
