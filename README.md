@@ -1,5 +1,5 @@
 # screen-parser
-C# Project that should be able to ocr a screen section for text. Specialized for FFXIV market history data
+C# Project that allows the user to select a region on a form. Then performs OCR on english characters and returns that to the console.
 
 Start the program
 * Use alt+1 to start a capture
