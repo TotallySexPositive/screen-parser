@@ -1,4 +1,5 @@
 ﻿
+using ScreenParser.DAO.Models;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -8,6 +9,8 @@ namespace ScreenParser
 {
     public class FormRect : Form
     {   
+        public string Text { get; set; }
+        private Item item;
         private Graphics formGraphics;
         private Rectangle rect;
         private bool isMouseDown = false;
@@ -15,10 +18,18 @@ namespace ScreenParser
         private int initialY;
         private double minOpacity = 0.01;
         private double maxOpacity = 0.25;
+
+        public FormRect(Item i)
+        {
+            this.item = i;
+            InitializeComponent();
+        }
+
         public FormRect()
         {
             InitializeComponent();
         }
+
 
 
         private void panel1_MouseMove(object sender, MouseEventArgs e)
@@ -54,7 +65,10 @@ namespace ScreenParser
                 Capture c = new Capture(rect);
                 //Process.Start("explorer.exe", ScreenParser.Capture.imagePath);
                 OCR o = new OCR(ScreenParser.Capture.imagePath);
-                this.Close();
+                DoneOCREventArgs args = new DoneOCREventArgs();
+                args.Text = o.Text;
+                args.Item = this.item;
+                OnDoneOCR(args);
             }
         }
 
@@ -73,5 +87,17 @@ namespace ScreenParser
             this.ResumeLayout(false);
 
         }
+        protected virtual void OnDoneOCR(DoneOCREventArgs e)
+        {
+            DoneOCR?.Invoke(this, e);
+        }
+
+        public event EventHandler<DoneOCREventArgs> DoneOCR;
+    }
+
+    public class DoneOCREventArgs : EventArgs
+    {
+        public string Text { get; set; }
+        public Item Item { get; set; }
     }
 }

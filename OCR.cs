@@ -6,6 +6,7 @@ namespace ScreenParser
 {
     class OCR
     {
+        public string Text { get; set; }
         public OCR(String imagePath)
         {
             try
@@ -21,8 +22,8 @@ namespace ScreenParser
                             var i = 1;
                             using (var page = engine.Process(img))
                             {
-                                var text = page.GetText();
-                                logger.Log("Text: {0}", text);
+                                Text = page.GetText();
+                                logger.Log("Text: {0}", Text);
                                 logger.Log("Mean confidence: {0}", page.GetMeanConfidence());
 
                                 using (var iter = page.GetIterator())

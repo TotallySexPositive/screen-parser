@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ScreenParser.DAO;
+using ScreenParser.DAO.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,18 +11,19 @@ using System.Windows.Forms;
 
 namespace ScreenParser
 {
-    class Program
+    class Program : Form
     {
         static void Main(string[] args)
         {
+            Accessor a = new Accessor();
             HotKeyManager.RegisterHotKey(Keys.D1, KeyModifiers.Alt);
             HotKeyManager.RegisterHotKey(Keys.Escape, KeyModifiers.Alt);
             HotKeyManager.RegisterHotKey(Keys.D2, KeyModifiers.Alt);
-            HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_StartCapture);
+            //HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_StartCapture);
             HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_KillProgram);
             HotKeyManager.HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_OpenImage);
             Application.EnableVisualStyles();
-            Application.Run();
+            Application.Run(new Viewer());
         }
 
         private static void HotKeyManager_StartCapture(object sender, HotKeyEventArgs e)
