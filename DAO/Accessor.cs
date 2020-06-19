@@ -31,9 +31,9 @@ namespace ScreenParser.DAO
             return null;
         }
 
-        public void AddSale(Sale sale, Item item)
+        public void AddSale(Sale sale)
         {
-            
+            db.Insert(sale);
         }
 
         public static List<Item> GetItems(SQLiteConnection db)

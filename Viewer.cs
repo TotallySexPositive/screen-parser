@@ -69,20 +69,26 @@ namespace ScreenParser
         {
             Item i = (Item)listBox1.SelectedItem;
             System.Console.WriteLine("Selected item: " + i.Name);
-            //Do the sales lookup (random data for now)
-            List<Sale> sales = new List<Sale>();
-            for (int j = 0; j < 10; j++)
+            //Do the sales lookup
+            List<Sale> sales = Accessor.QuerySales(db, i.ID);
+            if (sales.Count == 0)
             {
-                sales.Add(new Sale()
-                {
-                    ItemID = i.ID,
-                    Quantity = _random.Next(99),
-                    Price = _random.Next(1000),
-                    IsHq = _random.Next(2) >= 1,
-                    Buyer = _random.Next(100000000).ToString(),
-                    Date = DateTime.Now
-                });
+                return;
             }
+            //Do the sales lookup (random data for now)
+            //List<Sale> sales = new List<Sale>();
+            //for (int j = 0; j < 10; j++)
+            //{
+            //    sales.Add(new Sale()
+            //    {
+            //        ItemID = i.ID,
+            //        Quantity = _random.Next(99),
+            //        Price = _random.Next(1000),
+            //        IsHq = _random.Next(2) >= 1,
+            //        Buyer = _random.Next(100000000).ToString(),
+            //        Date = DateTime.Now
+            //    });
+            //}
             saleTable = new SaleTable(i, sales);
             DataTable t = saleTable.MakeTable();
             salesgrid.DataSource = saleTable.MakeTable();
@@ -117,7 +123,8 @@ namespace ScreenParser
 
         public static void c_DoneOCR(object sender, DoneOCREventArgs e)
         {
-            List<Sale> sales = new List<Sale>();
+            //List<Sale> sales = new List<Sale>();
+            Accessor a = new Accessor();
             string t = e.Text;
             String[] lines = t.Split('\n');
             foreach(string line in lines)
@@ -126,77 +133,52 @@ namespace ScreenParser
                 int price;
                 int offset = 0;
                 String[] parts = line.Split();
-                if (parts.Length < 6)
+                if (parts.Length < 5 || parts[0] == "HQ")
                 {
                     continue;
                 }
-                if (parts.Length == 6)
-                {
-                    if (parts[5].Count(c=>c == '/') == 1)
-                    {
-                        hq = true;
-                        offset = 1;
-                    }
-                    else
-                    {
-                        hq = false;
-                    }
-                    
-                }
-                else if (parts.Length == 7)
-                {
-                    if (parts[5].Count(c=>c == '/') == 1)
-                    {
-                        hq = true;
-                        offset = 1;
-                    }
-                    else
-                    {
-                        hq = false;
-                    }
-                }
-                else if (parts.Length == 8)
+                // HQ
+                if (parts[0].Length == 1)
                 {
                     hq = true;
                     offset = 1;
-                    
-                }else
-                {
-                    if (parts[5].Count(c=>c == '/') == 1)
-                    {
-                        //Then the date got effed and it was high quality
-                        hq = true;
-                    }
-                    else
-                    {
-                        hq = false;
-                        offset = 1;
-                    }
-                    
-                }
-                price = price = Int32.Parse(parts[offset].Substring(0, parts[offset].Length - 1)); ;
-                int quantity = Int32.Parse(parts[++offset]);
-                string buyer = parts[++offset] + " " + parts[++offset];
-                DateTime dt;
-                string datetimestr;
-                string format = "M/ddh:mmtt";
-                if (parts.Length - (offset + 1) == 2)
-                {
-                    //MM/ddhh:mmtt
-                    datetimestr = parts[++offset] + parts[++offset];
-                }
-                else if (parts.Length - (offset +1) == 1)
-                {
-                    datetimestr = parts[++offset];
                 }
                 else
                 {
-                    datetimestr = parts[++offset] + parts[++offset] + parts[++offset];
+                    hq = false;
+                }
+
+                //Price
+                string pricestr = parts[offset++].Replace(",",string.Empty);
+                price = Int32.Parse(pricestr.Substring(0, pricestr.Length - 1));
+
+                //Quantity
+                int quantity = Int32.Parse(parts[offset++]);
+
+                //Buyer: OCR worked right if the two parts don't contain numbers
+                string buyer;
+                if (!parts[offset].Any(char.IsDigit) && !parts[offset+1].Any(char.IsDigit))
+                {
+                    buyer = parts[offset++] + " " + parts[offset++];
+                }
+                else
+                {
+                    //OCR Didn't work and smashed em together. fuck it.
+                    buyer = parts[offset++];
+                }
+
+                
+                DateTime dt;
+                string datetimestr = "";
+                string format = "M/ddh:mmtt";
+                while (offset < parts.Length)
+                {
+                    datetimestr += parts[offset++];
                 }
                 datetimestr = datetimestr.Replace(".", string.Empty);
                 CultureInfo provider = CultureInfo.InvariantCulture;
                 dt = DateTime.ParseExact(datetimestr, format, provider);
-                sales.Add(new Sale()
+                a.AddSale(new Sale()
                 {
                     ItemID = e.Item.ID,
                     IsHq = hq,
@@ -204,18 +186,16 @@ namespace ScreenParser
                     Buyer = buyer,
                     Quantity = quantity,
                     Date = dt
-
                 });
-
             }
-            foreach (Sale s in sales)
-            {
-                Console.WriteLine("HQ: " + s.IsHq.ToString() + " Price: " + s.Price.ToString() +
-                    " Quantity: " + s.Quantity +
-                    " Buyer: " + s.Buyer +
-                    " Date: " + s.Date.ToString());
-            }
-            Accessor a = new Accessor();
+            //foreach (Sale s in sales)
+            //{
+            //    Console.WriteLine("HQ: " + s.IsHq.ToString() + " Price: " + s.Price.ToString() +
+            //        " Quantity: " + s.Quantity +
+            //        " Buyer: " + s.Buyer +
+            //        " Date: " + s.Date.ToString());
+            //}
+            
             ((FormRect)sender).Close();
         }
     }
